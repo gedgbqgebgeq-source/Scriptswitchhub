@@ -212,14 +212,29 @@ end
 -- REDEEM CODE
 task.spawn(function()
     local codes = {
+        "SECRET_ADMIN",
+        "KITT_RESET",
+        "Sub2CaptainMaui",
+        "Sub2Fer999",
+        "Enyu_is_Pro",
+        "Magicbus",
+        "JCWK",
+        "Starcodeheo",
+        "Bluxxy",
+        "fudd10_v2",
+        "FUDD10",
+        "BIGNEWS",
+        "THEGREATACE",
         "SUB2GAMERROBOT_EXP1",
         "SUB2GAMERROBOT_RESET1",
-        "SUB2NOOBMASTER123",
-        "SUB2UNCLEKIZARU",
-        "AXIORE",
-        "BIGNEWS",
-        "FUDD10",
-        "FUDD10_V2"
+        "Sub2OfficialNoobie",
+        "StrawHatMaine"
+}
+
+for i,v in pairs(codes) do
+game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer(v)
+task.wait(1)
+end
     }
 
     for _,code in pairs(codes) do
