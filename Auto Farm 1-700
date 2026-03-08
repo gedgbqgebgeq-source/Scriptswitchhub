@@ -648,9 +648,11 @@ spawn(function()
     end
 end)
 
--- MOB MAGNET
+-- MOB MAGNET (2 MONSTERS)
 task.spawn(function()
     while task.wait(0.2) do
+
+        local count = 0
 
         for _,v in pairs(workspace.Enemies:GetChildren()) do
         
@@ -659,20 +661,24 @@ task.spawn(function()
             and v:FindFirstChild("HumanoidRootPart")
             and v.Humanoid.Health > 0 then
             
-                pcall(function()
+                if count < 2 then
+                    count = count + 1
 
-                    v.HumanoidRootPart.CanCollide = false
-                    v.HumanoidRootPart.Size = Vector3.new(60,60,60)
+                    pcall(function()
 
-                    if player.Character
-                    and player.Character:FindFirstChild("HumanoidRootPart") then
-                    
-                        v.HumanoidRootPart.CFrame =
-                        player.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-5)
+                        v.HumanoidRootPart.CanCollide = false
+                        v.HumanoidRootPart.Size = Vector3.new(60,60,60)
+
+                        if player.Character
+                        and player.Character:FindFirstChild("HumanoidRootPart") then
                         
-                    end
+                            v.HumanoidRootPart.CFrame =
+                            player.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-5)
+                            
+                        end
 
-                end)
+                    end)
+                end
 
             end
             
