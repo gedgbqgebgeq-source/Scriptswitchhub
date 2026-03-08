@@ -695,17 +695,14 @@ while task.wait(0.1) do
 local Main = player.PlayerGui:WaitForChild("Main")
 local Quest = Main:WaitForChild("Quest")
 local QuestTitle = Quest.Container:WaitForChild("QuestTitle")
-local QuestText = QuestTitle:FindFirstChildWhichIsA("TextLabel")
+local QuestText = Quest.Container.QuestTitle:FindFirstChildWhichIsA("TextLabel")
+local QuestName = QuestText and QuestText.Text or ""
 
 local char = player.Character
 local hrp = char and char:FindFirstChild("HumanoidRootPart")
 if not hrp then continue end
 
-if not Quest.Visible or not QuestText or not
-string.find(QuestText.Text, Mon) then
-
--- ถ้าไม่มีเควส หรือ เควสไม่ตรง
-if not Quest.Visible or not string.find(QuestTitle.Text, Mon) then
+if not Quest.Visible or not string.find(QuestName, Mon) then
 
     Settings.AutoClick = false
     GettingQuest = true
