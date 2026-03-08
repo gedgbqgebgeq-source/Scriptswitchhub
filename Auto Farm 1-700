@@ -675,16 +675,18 @@ GettingQuest = true
     
     -- ไปหา NPC รับเควส
     TweenTo(CFrameQuest)
-    task.wait(0.5)
+    task.wait(1.5)
 
-    ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest",NameQuest,LevelQuest)
-    
-    task.wait(1)
+pcall(function()
+    ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
+end)
+
+    task.wait(2)
     GettingQuest = false
 else
     
     -- ฟาร์มมอน
-    for _,v in pairs(workspace.Enemies:GetChildren()) do
+    for _,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
     
     if not v:FindFirstChild("HumanoidRootPart") then continue end
     
@@ -703,8 +705,8 @@ else
 
                 TweenTo(v.HumanoidRootPart.CFrame * CFrame.new(0,20,0))
 
-            until v.Humanoid.Health <= 0
-            or not player.PlayerGui.Main.Quest.Visible
+            until v.Humanoid.Health <= 0  
+            or not Quest.Visible
 
         end
 
