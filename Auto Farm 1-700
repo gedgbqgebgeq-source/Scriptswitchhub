@@ -648,73 +648,105 @@ spawn(function()
     end
 end)
 
--- AUTO FARM WITH QUEST CHECK
+-- MOB MAGNET
+task.spawn(function()
+    while task.wait(0.2) do
+
+        for _,v in pairs(workspace.Enemies:GetChildren()) do
+        
+            if v.Name == Mon
+            and v:FindFirstChild("Humanoid")
+            and v:FindFirstChild("HumanoidRootPart")
+            and v.Humanoid.Health > 0 then
+            
+                pcall(function()
+
+                    v.HumanoidRootPart.CanCollide = false
+                    v.HumanoidRootPart.Size = Vector3.new(60,60,60)
+
+                    if player.Character
+                    and player.Character:FindFirstChild("HumanoidRootPart") then
+                    
+                        v.HumanoidRootPart.CFrame =
+                        player.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-5)
+                        
+                    end
+
+                end)
+
+            end
+            
+        end
+
+    end
+end)
+
+-- AUTO FARM
 task.spawn(function()
 
 while task.wait(0.1) do
 
 local Main = player.PlayerGui:WaitForChild("Main")
 local Quest = Main:WaitForChild("Quest")
-
-if not Quest.Visible then
-    CheckQuest()
-end
+local QuestTitle = Quest.Container:WaitForChild("QuestTitle")
 
 local char = player.Character
 local hrp = char and char:FindFirstChild("HumanoidRootPart")
 if not hrp then continue end
 
--- เช็คว่าเควสมีไหม
-local Main = player.PlayerGui:WaitForChild("Main")
-local Quest = Main:WaitForChild("Quest")
+CheckQuest()
 
-if not Quest.Visible then
+-- ถ้าไม่มีเควส หรือ เควสไม่ตรง
+if not Quest.Visible or not string.find(QuestTitle.Text, Mon) then
 
-Settings.AutoClick = false
-GettingQuest = true
-    
-    -- ไปหา NPC รับเควส
+    Settings.AutoClick = false
+    GettingQuest = true
+
+    pcall(function()
+        ReplicatedStorage.Remotes.CommF_:InvokeServer("AbandonQuest")
+    end)
+
+    task.wait(0.5)
+
     TweenTo(CFrameQuest)
     task.wait(1.5)
 
-pcall(function()
-    ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
-end)
+    pcall(function()
+        ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
+    end)
 
     task.wait(2)
     GettingQuest = false
-else
-    
-    -- ฟาร์มมอน
-    for _,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-    
-    if not v:FindFirstChild("HumanoidRootPart") then continue end
-    
-    EquipWeapon()
-    Settings.AutoClick = true
 
-        if v.Name == Mon 
-        and v:FindFirstChild("Humanoid") 
+else
+
+    -- ฟาร์มมอน
+    for _,v in pairs(workspace.Enemies:GetChildren()) do
+
+        if v.Name == Mon
+        and v:FindFirstChild("Humanoid")
+        and v:FindFirstChild("HumanoidRootPart")
         and v.Humanoid.Health > 0 then
+
+            EquipWeapon()
+            Settings.AutoClick = true
 
             repeat task.wait(0.05)
 
-            Settings.AutoClick = true
-
-            if GettingQuest then break end
+                if GettingQuest then break end
 
                 TweenTo(v.HumanoidRootPart.CFrame * CFrame.new(0,20,0))
 
-            until v.Humanoid.Health <= 0  
+            until v.Humanoid.Health <= 0
             or not Quest.Visible
 
         end
-
     end
 
 end
 
 end
+
 end)
 
 -- AUTO STATS
