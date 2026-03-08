@@ -648,43 +648,65 @@ spawn(function()
     end
 end)
 
--- MOB MAGNET (2 MONSTERS)
+-- MOB MAGNET (2 MONSTERS) — fixed (anchor & ground pos + auto-unanchor on death)
 task.spawn(function()
-    while task.wait(0.2) do
-
+    while task.wait(0.25) do
         local count = 0
+        local hrpPlayer = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if not hrpPlayer then continue end
 
-        for _,v in pairs(workspace.Enemies:GetChildren()) do
-        
-            if v.Name == Mon
-            and v:FindFirstChild("Humanoid")
-            and v:FindFirstChild("HumanoidRootPart")
-            and v.Humanoid.Health > 0 then
-            
-                if count < 2 then
-                    count = count + 1
+        for _, v in pairs(workspace:WaitForChild("Enemies"):GetChildren()) do
+            if count >= 2 then break end
 
-                    pcall(function()
+            local h = v:FindFirstChild("Humanoid")
+            local root = v:FindFirstChild("HumanoidRootPart")
+            if not h or not root then continue end
+            if v.Name ~= Mon then continue end
+            if h.Health <= 0 then continue end
 
-                        v.HumanoidRootPart.CanCollide = false
-                        v.HumanoidRootPart.Size = Vector3.new(60,60,60)
-                        v.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
-                        v.HumanoidRootPart.RotVelocity = Vector3.new(0,0,0)
+            -- ถ้ายังไม่ติด tag ว่าล็อคไว้ ให้ล็อค
+            if not v:FindFirstChild("_magnetLocked") then
+                pcall(function()
+                    -- ตำแหน่งเป้าหมาย: หน้า player และเล็กน้อยต่ำลง (ไม่ลงลึกจนทะลุพื้น)
+                    local offset = Vector3.new(0, -3, -6) -- ปรับได้ (y = -3 ใต้ผู้เล่นเล็กน้อย)
+                    local targetPos = hrpPlayer.Position + offset
 
-                        v.Humanoid:ChangeState(11)
+                    -- ป้องกันฟิสิกส์ชั่วคราว
+                    root.Velocity = Vector3.new(0,0,0)
+                    root.RotVelocity = Vector3.new(0,0,0)
 
-                        v.HumanoidRootPart.CFrame =
-                        player.Character.HumanoidRootPart.CFrame * CFrame.new(0,-10,-5)
-                            
-                        end
+                    -- ล็อคตำแหน่งแบบ local
+                    root.Anchored = true
+                    h.PlatformStand = true
 
+                    -- วางมอนลงที่ตำแหน่งที่คำนวน (ไม่ลงลึกเกินไป)
+                    root.CFrame = CFrame.new(targetPos)
+
+                    -- ทำ tag ไว้เพื่อติดตามและ reset เมื่อมอนตาย/หายไป
+                    local tag = Instance.new("BoolValue")
+                    tag.Name = "_magnetLocked"
+                    tag.Parent = v
+
+                    -- เมื่อมอนตาย ให้คืนสภาพ (unanchor)
+                    h.Died:Connect(function()
+                        pcall(function()
+                            if root and root:IsA("BasePart") then
+                                root.Anchored = false
+                            end
+                            if h and h:IsA("Humanoid") then
+                                h.PlatformStand = false
+                            end
+                            if tag and tag.Parent then tag:Destroy() end
+                        end)
                     end)
-                end
+                end)
 
+                count = count + 1
+            else
+                -- ถ้ามี tag อยู่แล้ว แค่เพิ่ม counter (มันถูกดึงไว้แล้ว)
+                count = count + 1
             end
-            
         end
-
     end
 end)
 
