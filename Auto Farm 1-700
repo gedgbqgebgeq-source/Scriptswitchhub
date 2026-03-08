@@ -653,7 +653,10 @@ task.spawn(function()
 
 while task.wait(0.1) do
 
-if not player.PlayerGui.Main.Quest.Visible then
+local Main = player.PlayerGui:WaitForChild("Main")
+local Quest = Main:WaitForChild("Quest")
+
+if not Quest.Visible then
     CheckQuest()
 end
 
@@ -662,7 +665,10 @@ local hrp = char and char:FindFirstChild("HumanoidRootPart")
 if not hrp then continue end
 
 -- เช็คว่าเควสมีไหม
-if not player.PlayerGui.Main:FindFirstChild("Quest") or not player.PlayerGui.Main.Quest.Visible then
+local Main = player.PlayerGui:WaitForChild("Main")
+local Quest = Main:WaitForChild("Quest")
+
+if not Quest.Visible then
 
 Settings.AutoClick = false
 GettingQuest = true
