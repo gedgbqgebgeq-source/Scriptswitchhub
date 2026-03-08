@@ -679,8 +679,8 @@ task.spawn(function()
                     root.RotVelocity = Vector3.new(0,0,0)
 
                     -- ล็อคตำแหน่งแบบ local
-                    root.Anchored = true
-                    h.PlatformStand = true
+                    root.CanCollide = false
+                    h.WalkSpeed = 0
 
                     -- วางมอนลงที่ตำแหน่งที่คำนวน (ไม่ลงลึกเกินไป)
                     root.CFrame = CFrame.new(targetPos)
