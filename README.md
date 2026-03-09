@@ -206,11 +206,12 @@ end)
 repeat task.wait()
 until game.Players.LocalPlayer:FindFirstChild("PlayerScripts")
 and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
+repeat task.wait() until game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 
 --------------------------
 -- FAST ATTACK (fixed)
 --------------------------
-local CombatFramework = require(game:GetService("Players").LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
+local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
     local GetFastAttack = debug.getupvalues(CombatFramework)[2]
@@ -226,7 +227,9 @@ end
 
 local function AttackNoCD()
     local plr = game:GetService("Players").LocalPlayer
-    local GetFastAttack = debug.getupvalues(CombatFramework)[2]
+    local up = debug.getupvalues(CombatFramework)
+    if not up or not up[2] then return end
+    local GetFastAttack = up[2]
     local activeController = GetFastAttack.activeController
 
     local RigLib =
@@ -310,7 +313,7 @@ local sethiddenproperty = sethiddenproperty or function() end
 for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
 if v.Name == TargetName then
 if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
-if (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < bringfrec then
+if (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < tonumber(bringfrec) then
 v.HumanoidRootPart.CFrame = TargetCFrame
 v.HumanoidRootPart.CanCollide = false
 v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
@@ -470,7 +473,7 @@ do
     local screen = Instance.new("ScreenGui")
     screen.Name = "SwitchHub_UI"
     screen.ResetOnSpawn = false
-    screen.Parent = game.Players.LocalPlayer.PlayerGui
+    screen.Parent = game.CoreGui
 
     local main = Instance.new("Frame", screen)
     main.Name = "MainFrame"
