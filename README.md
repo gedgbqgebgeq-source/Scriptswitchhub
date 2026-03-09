@@ -112,9 +112,18 @@ end)
 repeat task.wait()
 until game.Players.LocalPlayer:FindFirstChild("PlayerScripts")
 and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
-repeat task.wait() until game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
+
+local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 -- FAST ATTACK (fixed)
+local CombatFramework = nil
+
+repeat task.wait()
+    pcall(function()
+        CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
+    end)
+until CombatFramework
+
 local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
