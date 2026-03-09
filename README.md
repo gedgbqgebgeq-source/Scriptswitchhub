@@ -254,10 +254,13 @@ task.spawn(function()
 end)
 
 -- BRING MOB
+local bringfrec = 350
+
 function BringMonster(TargetName,TargetCFrame)
 
 if not LocalPlayer.Character then return end
-if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+local hrpPlayer = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+if not hrpPlayer then return end
 
 local enemies = workspace:FindFirstChild("Enemies")
 if not enemies then return end
@@ -270,22 +273,18 @@ and v:FindFirstChild("HumanoidRootPart")
 and v.Humanoid.Health > 0 then
 
 local hrp = v.HumanoidRootPart
+local dist = (hrp.Position - hrpPlayer.Position).Magnitude
 
-if (hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < bringfrec then
+if dist <= bringfrec then
 
 hrp.CFrame = TargetCFrame
 hrp.CanCollide = false
 hrp.Size = Vector3.new(60,60,60)
-hrp.Transparency = 1
 
 pcall(function()
 v.Humanoid:ChangeState(11)
 v.Humanoid:ChangeState(14)
 end)
-
-if v.Humanoid:FindFirstChild("Animator") then
-v.Humanoid.Animator:Destroy()
-end
 
 end
 end
