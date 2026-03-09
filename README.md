@@ -74,17 +74,18 @@ end
 
 -- TWEEN
 local currentTween = nil
+
 local function TweenTo(cf, speed)
 
-    if typeof(cf) ~= "CFrame" then return end  -- กัน error
-
-    speed = speed or (_G.Main and _G.Main.TweenSpeed) or 350
+    if typeof(cf) ~= "CFrame" then return end
     if not LocalPlayer.Character then return end
     if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
 
+    speed = speed or (_G.Main and _G.Main.TweenSpeed) or 350
+
     local hrp = LocalPlayer.Character.HumanoidRootPart
 
-    if currentTween then
+    if currentTween and typeof(currentTween.Cancel) == "function" then
         pcall(function()
             currentTween:Cancel()
         end)
@@ -92,32 +93,38 @@ local function TweenTo(cf, speed)
 
     local dist = (hrp.Position - cf.Position).Magnitude
     if dist < 5 then return end
-    local time = math.max(dist / speed, 0.12)
+
+    local time = math.max(dist / speed,0.12)
 
     currentTween = TweenService:Create(
         hrp,
-        TweenInfo.new(time, Enum.EasingStyle.Linear),
+        TweenInfo.new(time,Enum.EasingStyle.Linear),
         {CFrame = cf}
     )
 
-    pcall(function()
-        currentTween:Play()
-    end)
+    if currentTween and typeof(currentTween.Play) == "function" then
+        pcall(function()
+            currentTween:Play()
+        end)
+    end
 end
 
 -- AUTO HAKI
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
-            if remoteComm then
+
+            if remoteComm and typeof(remoteComm.InvokeServer) == "function" then
                 if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
-                   remoteComm:InvokeServer("Buso")
-            end
+                    remoteComm:InvokeServer("Buso")
+                end
             else
-                -- fallback names
                 local alt = getRemote("Buso") or getRemote("Haki")
-                if alt then pcall(function() alt:InvokeServer() end) end
+                if alt and typeof(alt.InvokeServer) == "function" then
+                    alt:InvokeServer()
+                end
             end
+
         end)
     end
 end)
@@ -204,7 +211,16 @@ local function AttackNoCD()
 
         pcall(function()
             if plr.Character and plr.Character:FindFirstChildOfClass("Tool") and activeController.blades and activeController.blades[1] then
-                activeController.animator.anims.basic[1]:Play(0.01, 0.01, 0.01)
+
+if activeController.animator
+and activeController.animator.anims
+and activeController.animator.anims.basic
+and activeController.animator.anims.basic[1]
+and typeof(activeController.animator.anims.basic[1].Play) == "function" then
+
+activeController.animator.anims.basic[1]:Play(0.01,0.01,0.01)
+
+end
                 game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange", tostring(GetCurrentBlade()))
                 if game.ReplicatedStorage:FindFirstChild("Remotes") and game.ReplicatedStorage.Remotes:FindFirstChild("Validator") then
                     game.ReplicatedStorage.Remotes.Validator:FireServer(math.floor(u12 / 1099511627776 * 16777215), u10)
@@ -238,33 +254,39 @@ task.spawn(function()
 end)
 
 -- BRING MOB
-local bringfrec = tonumber(300) or 300
+function BringMonster(TargetName,TargetCFrame)
 
-function BringMonster(TargetName, TargetCFrame)
+if not LocalPlayer.Character then return end
+if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
 
--- กัน error
-if not game.Players.LocalPlayer.Character then return end
-if not game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+local enemies = workspace:FindFirstChild("Enemies")
+if not enemies then return end
 
-if not game:GetService("Workspace"):FindFirstChild("Enemies") then 
-    return 
-end
+for i,v in pairs(enemies:GetChildren()) do
 
-for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-if v.Name == TargetName then
-if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
-if v:FindFirstChild("HumanoidRootPart") and
-(v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < bringfrec then
-v.HumanoidRootPart.CFrame = TargetCFrame
-v.HumanoidRootPart.CanCollide = false
-v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
-v.HumanoidRootPart.Transparency = 1
+if v.Name == TargetName
+and v:FindFirstChild("Humanoid")
+and v:FindFirstChild("HumanoidRootPart")
+and v.Humanoid.Health > 0 then
+
+local hrp = v.HumanoidRootPart
+
+if (hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < bringfrec then
+
+hrp.CFrame = TargetCFrame
+hrp.CanCollide = false
+hrp.Size = Vector3.new(60,60,60)
+hrp.Transparency = 1
+
+pcall(function()
 v.Humanoid:ChangeState(11)
 v.Humanoid:ChangeState(14)
+end)
+
 if v.Humanoid:FindFirstChild("Animator") then
 v.Humanoid.Animator:Destroy()
 end
-end
+
 end
 end
 end
