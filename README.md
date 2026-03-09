@@ -1,8 +1,5 @@
-if not game:IsLoaded() then
-    repeat
-        game.Loaded:Wait()
-    until game:IsLoaded()
-end
+repeat task.wait() until game:IsLoaded()
+
 _G.Switch_Hub_Series_X = true -- เปิดใช้งาน Series x
 _G.Main = {
     ['AutoFarm'] = true,
