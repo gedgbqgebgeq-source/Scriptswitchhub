@@ -226,9 +226,15 @@ end)
 local bringfrec = tonumber(300) or 300
 
 function BringMonster(TargetName, TargetCFrame)
+
+-- กัน error
+if not game.Players.LocalPlayer.Character then return end
+if not game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+
 if not game:GetService("Workspace"):FindFirstChild("Enemies") then 
     return 
 end
+
 for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
 if v.Name == TargetName then
 if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
