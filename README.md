@@ -120,11 +120,10 @@ local CombatFramework = nil
 
 repeat task.wait()
     pcall(function()
-        CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
+        CombatFramework = 
+        require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
     end)
 until CombatFramework
-
-local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
     local up = debug.getupvalues(CombatFramework)
