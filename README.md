@@ -203,10 +203,14 @@ task.spawn(function()
     end
 end)
 
+repeat task.wait()
+until game.Players.LocalPlayer:FindFirstChild("PlayerScripts")
+and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
+
 --------------------------
 -- FAST ATTACK (fixed)
 --------------------------
-local CombatFramework = require(game:GetService('Players').LocalPlayer.PlayerScripts.CombatFramework)
+local CombatFramework = require(game:GetService("Players").LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
     local GetFastAttack = debug.getupvalues(CombatFramework)[2]
@@ -225,7 +229,8 @@ local function AttackNoCD()
     local GetFastAttack = debug.getupvalues(CombatFramework)[2]
     local activeController = GetFastAttack.activeController
 
-    local getBladeHits = require(game.ReplicatedStorage.CombatFramework.RigLib).getBladeHits(plr.Character, {plr.Character.HumanoidRootPart}, 60)
+    local RigLib = require(game.ReplicatedStorage:WaitForChild("CombatFramework"):WaitForChild("RigLib"))
+local getBladeHits = RigLib.getBladeHits(plr.Character, {plr.Character.HumanoidRootPart}, 60)
     local cac = {}
     local hash = {}
     for k, v in pairs(getBladeHits) do
