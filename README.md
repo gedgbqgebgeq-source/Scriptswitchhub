@@ -72,26 +72,36 @@ task.spawn(function()
     end
 end
 
--- TWEEN TO HELPER
+-- TWEEN
 local currentTween = nil
 local function TweenTo(cf, speed)
 
-    if not cf then return end
+    if typeof(cf) ~= "CFrame" then return end  -- กัน error
 
     speed = speed or (_G.Main and _G.Main.TweenSpeed) or 350
-    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
-    pcall(function()
-        if currentTween then currentTween:Cancel() end
-    end)
+    if not LocalPlayer.Character then return end
+    if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+
     local hrp = LocalPlayer.Character.HumanoidRootPart
-    local dist = (hrp.Position - cf.Position).Magnitude
-    local time = math.max(dist / speed, 0.12)
+
     if currentTween then
-        currentTween:Cancel()
+        pcall(function()
+            currentTween:Cancel()
+        end)
     end
 
-    currentTween = TweenService:Create(hrp, TweenInfo.new(time, Enum.EasingStyle.Linear), {CFrame = cf})
-    pcall(function() currentTween:Play() end)
+    local dist = (hrp.Position - cf.Position).Magnitude
+    local time = math.max(dist / speed, 0.12)
+
+    currentTween = TweenService:Create(
+        hrp,
+        TweenInfo.new(time, Enum.EasingStyle.Linear),
+        {CFrame = cf}
+    )
+
+    pcall(function()
+        currentTween:Play()
+    end)
 end
 
 -- AUTO HAKI
