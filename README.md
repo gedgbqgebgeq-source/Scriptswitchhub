@@ -214,8 +214,12 @@ repeat task.wait() until game.Players.LocalPlayer.PlayerScripts:FindFirstChild("
 local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
-    local GetFastAttack = debug.getupvalues(CombatFramework)[2]
+    local up = debug.getupvalues(CombatFramework)
+    if not up or not up[2] then return nil end
+
+    local GetFastAttack = up[2]
     local activeController = GetFastAttack.activeController
+    if not activeController then return nil end
     local blades = activeController.blades and activeController.blades[1]
     if not blades then return end
     while blades.Parent ~= game.Players.LocalPlayer.Character do
@@ -230,7 +234,9 @@ local function AttackNoCD()
     local up = debug.getupvalues(CombatFramework)
     if not up or not up[2] then return end
     local GetFastAttack = up[2]
-    local activeController = GetFastAttack.activeController
+    local activeController = GetFastAttack and
+    GetFastAttack.activeController
+    if not activeController then return end
 
     local RigLib =
     require(game.ReplicatedStorage:WaitForChild("CombatFramework"):WaitForChild("RigLib"))
@@ -313,7 +319,8 @@ local sethiddenproperty = sethiddenproperty or function() end
 for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
 if v.Name == TargetName then
 if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
-if (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < tonumber(bringfrec) then
+if v:FindFirstChild("HumanoidRootPart") and
+(v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < tonumber(bringfrec) then
 v.HumanoidRootPart.CFrame = TargetCFrame
 v.HumanoidRootPart.CanCollide = false
 v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
