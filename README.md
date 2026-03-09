@@ -125,12 +125,12 @@ and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 
 local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
--- FAST ATTACK (fixed)
-local CombatFramework = nil
+-- FAST ATTACK
+local CombatFramework
 
 repeat task.wait()
     pcall(function()
-        CombatFramework = 
+        CombatFramework =
         require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
     end)
 until CombatFramework
