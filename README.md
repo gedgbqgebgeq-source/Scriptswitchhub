@@ -1,7 +1,5 @@
 -- SWITCH HUB (Series X)
---------------------------
 -- CONFIG (ถ้าคุณวาง config ไว้แล้ว ให้ลบส่วนนี้ออก)
---------------------------
 if not game:IsLoaded() then
     repeat
         game.Loaded:Wait()
@@ -93,9 +91,7 @@ _G.Mastery = { -- เลือกมาสเตอรี่ที่ต้อ�
 -- Redeem codes (ใช้ของคุณได้)
 local DEFAULT_CODES = {"Sub2Fer999","Enyu_is_Pro","Magicbus","JCWK","Starcodeheo","Bluxxy"}
 
---------------------------
 -- CORE / UTIL
---------------------------
 local Players = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
@@ -145,9 +141,7 @@ pcall(function()
     end
 end)
 
---------------------------
 -- REDEEM CODES (try list)
---------------------------
 task.spawn(function()
     local codes = (_G.RedeemCodes and type(_G.RedeemCodes)=="table") and _G.RedeemCodes or DEFAULT_CODES
     for _, c in ipairs(codes) do
@@ -163,11 +157,9 @@ task.spawn(function()
         end)
         task.wait(0.6)
     end
-end)
+end
 
---------------------------
 -- TWEEN TO HELPER
---------------------------
 local currentTween = nil
 local function TweenTo(cf, speed)
     speed = speed or (_G.Main and _G.Main.TweenSpeed) or 325
@@ -186,9 +178,7 @@ local function TweenTo(cf, speed)
     pcall(function() currentTween:Play() end)
 end
 
---------------------------
 -- AUTO HAKI
---------------------------
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
@@ -208,9 +198,7 @@ until game.Players.LocalPlayer:FindFirstChild("PlayerScripts")
 and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 repeat task.wait() until game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 
---------------------------
 -- FAST ATTACK (fixed)
---------------------------
 local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework") or game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
@@ -309,9 +297,8 @@ task.spawn(function()
         end
     end
 end)
---------------------------
+
 -- BRING MOB
---------------------------
 local bringfrec = 300
 
 function BringMonster(TargetName, TargetCFrame)
@@ -335,9 +322,7 @@ end
 end
 end
 
---------------------------
 -- CHECK/Equip weapon
---------------------------
 local function EquipToolIfAny()
     pcall(function()
         if not LocalPlayer.Character then return end
@@ -351,10 +336,8 @@ local function EquipToolIfAny()
     end)
 end
 
---------------------------
 -- MAPPINGS: level ranges -> quests & mob CFrames
 -- (ผมย้าย mapping มาเป็นตารางเพื่ออ่านง่าย และแก้เงื่อนไขให้ถูกต้อง)
---------------------------
 local levelData = {
     -- FIRST SEA (ตัวอย่างหลายช่วงจากข้อมูลของคุณ)
     {min=1, max=9, Ms="Bandit", NameQuest="BanditQuest1", QuestLv=1, CFrameQ=CFrame.new(1060.9383,16.4550,1547.7841), CFrameMon=CFrame.new(1038.5533,41.2962,1576.5099)},
@@ -395,9 +378,7 @@ local function getMappingForLevel(Lv)
     return nil
 end
 
---------------------------
 -- CheckMob / CheckQuest / Mob Magnet / Farm Loop
---------------------------
 local function findMobByName(name)
     for _, v in pairs(workspace.Enemies:GetChildren()) do
         if v.Name == name and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
@@ -466,9 +447,7 @@ task.spawn(function()
     end
 end)
 
---------------------------
 -- UI: Build scrollable UI like image (closest)
---------------------------
 do
     local CoreGui = game:GetService("CoreGui")
     -- remove existing
@@ -685,8 +664,6 @@ do
     end)
 end
 
---------------------------
 -- FINISHED
---------------------------
 print("Switch Hub loaded. UI created. Auto features active (redeem, fast attack, auto haki, basic auto farm).")
 print("If remote names differ or specific mapping missing, tell me the error in output and I'll patch it.")
