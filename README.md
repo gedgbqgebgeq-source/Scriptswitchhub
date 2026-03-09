@@ -89,7 +89,7 @@ _G.Mastery = { -- เลือกมาสเตอรี่ที่ต้อ�
 -- Redeem codes (ใช้ของคุณได้)
 local DEFAULT_CODES = {"Sub2Fer999","Enyu_is_Pro","Magicbus","JCWK","Starcodeheo","Bluxxy"}
 
--- CORE / UTIL
+-- CORE
 local Players = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
