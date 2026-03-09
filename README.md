@@ -91,6 +91,7 @@ local function TweenTo(cf, speed)
     end
 
     local dist = (hrp.Position - cf.Position).Magnitude
+    if dist < 5 then return end
     local time = math.max(dist / speed, 0.12)
 
     currentTween = TweenService:Create(
@@ -109,7 +110,9 @@ task.spawn(function()
     while task.wait(1) do
         pcall(function()
             if remoteComm then
-                remoteComm:InvokeServer("Buso")
+                if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
+                   remoteComm:InvokeServer("Buso")
+            end
             else
                 -- fallback names
                 local alt = getRemote("Buso") or getRemote("Haki")
@@ -151,6 +154,10 @@ end
 
 local function AttackNoCD()
     local plr = game:GetService("Players").LocalPlayer
+    
+    if not plr.Character then return end
+    if not plr.Character:FindFirstChild("HumanoidRootPart") then
+    return end
     local up = debug.getupvalues(CombatFramework)
     if not up or not up[2] then return end
     local GetFastAttack = up[2]
@@ -355,6 +362,9 @@ local function StartQuestIfNeeded(mapping)
         end
     end)
 end
+
+repeat task.wait()
+until LocalPlayer:FindFirstChild("Data")
 
 -- Farm loop (หลัก)
 task.spawn(function()
