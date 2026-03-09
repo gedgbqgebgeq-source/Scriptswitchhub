@@ -96,14 +96,17 @@ local LocalPlayer = Players.LocalPlayer
 
 -- safe find remote helper (พยายามหา Remotes.CommF_ หรือ CommF หรือชื่ออื่น)
 local function getRemote(name)
-    local ok, rem = pcall(function()
-        if Replicated:FindFirstChild("Remotes") and Replicated.Remotes:FindFirstChild(name) then
+    if Replicated:FindFirstChild("Remotes") then
+        if Replicated.Remotes:FindFirstChild(name) then
             return Replicated.Remotes[name]
-        elseif Replicated:FindFirstChild(name) then
-            return Replicated[name]
         end
-    end)
-    return ok and rem or nil
+    end
+
+    if Replicated:FindFirstChild(name) then
+        return Replicated[name]
+    end
+
+    return nil
 end
 
 local remoteComm = getRemote("CommF_") or getRemote("CommF") or getRemote("CommF__") or getRemote("Comm")
@@ -194,7 +197,7 @@ and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 repeat task.wait() until game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 
 -- FAST ATTACK (fixed)
-local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework") or game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
+local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
     local up = debug.getupvalues(CombatFramework)
@@ -294,14 +297,14 @@ task.spawn(function()
 end)
 
 -- BRING MOB
-local bringfrec = 300
+local bringfrec = tonumber(300) or 300
 
 function BringMonster(TargetName, TargetCFrame)
 for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
 if v.Name == TargetName then
 if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
 if v:FindFirstChild("HumanoidRootPart") and
-(v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < tonumber(bringfrec) then
+(v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < bringfrec then
 v.HumanoidRootPart.CFrame = TargetCFrame
 v.HumanoidRootPart.CanCollide = false
 v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
@@ -658,6 +661,11 @@ do
         task.delay(1, function() saveBtn.Text = "Save partial settings to _G" end)
     end)
 end
+
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    game:GetService("VirtualUser"):CaptureController()
+    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+end)
 
 -- FINISHED
 print("Switch Hub loaded. UI created. Auto features active (redeem, fast attack, auto haki, basic auto farm).")
