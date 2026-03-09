@@ -123,8 +123,6 @@ repeat task.wait()
 until game.Players.LocalPlayer:FindFirstChild("PlayerScripts")
 and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 
-local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
-
 -- FAST ATTACK
 local CombatFramework
 
