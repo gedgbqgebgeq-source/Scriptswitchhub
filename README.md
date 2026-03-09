@@ -429,7 +429,7 @@ end
 task.spawn(function()
     while task.wait(0.3) do
         pcall(function()
-            if not _G.Main and _G.Main.AutoFarm then
+            if not _G.Main or not _G.Main.AutoFarm then
                     return
                 end
                 
