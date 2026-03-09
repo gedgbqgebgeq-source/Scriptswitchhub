@@ -75,7 +75,10 @@ end
 -- TWEEN TO HELPER
 local currentTween = nil
 local function TweenTo(cf, speed)
-    speed = speed or (_G.Main and _G.Main.TweenSpeed) or 325
+
+    if not cf then return end
+
+    speed = speed or (_G.Main and _G.Main.TweenSpeed) or 350
     if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
     pcall(function()
         if currentTween then currentTween:Cancel() end
@@ -192,7 +195,7 @@ local function AttackNoCD()
 end
 
 local FastAttack = true
-local FastAttackDelay = 0.05
+local FastAttackDelay = 0.08
 
 task.spawn(function()
     while task.wait(FastAttackDelay) do
@@ -215,6 +218,9 @@ end)
 local bringfrec = tonumber(300) or 300
 
 function BringMonster(TargetName, TargetCFrame)
+if not game:GetService("Workspace"):FindFirstChild("Enemies") then 
+    return 
+end
 for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
 if v.Name == TargetName then
 if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
