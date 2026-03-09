@@ -211,7 +211,7 @@ repeat task.wait() until game.Players.LocalPlayer.PlayerScripts:FindFirstChild("
 --------------------------
 -- FAST ATTACK (fixed)
 --------------------------
-local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
+local CombatFramework = require(game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework") or game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
 
 local function GetCurrentBlade()
     local up = debug.getupvalues(CombatFramework)
@@ -293,7 +293,7 @@ end
 local FastAttack = true
 local FastAttackDelay = 0.05
 
-spawn(function()
+task.spawn(function()
     while task.wait(FastAttackDelay) do
         if FastAttack then
             pcall(function()
@@ -315,7 +315,6 @@ end)
 local bringfrec = 300
 
 function BringMonster(TargetName, TargetCFrame)
-local sethiddenproperty = sethiddenproperty or function() end
 for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
 if v.Name == TargetName then
 if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
