@@ -1,5 +1,3 @@
--- SWITCH HUB (Series X)
--- CONFIG (ถ้าคุณวาง config ไว้แล้ว ให้ลบส่วนนี้ออก)
 if not game:IsLoaded() then
     repeat
         game.Loaded:Wait()
