@@ -10,7 +10,7 @@ end
 _G.Switch_Hub_Series_X = true -- เปิดใช้งาน Series x
 _G.Main = {
     ['AutoFarm'] = true,
-    ['TweenSpeed'] = 325,
+    ['TweenSpeed'] = 350,
     ['FPS Booster'] = true, -- ปรับภาพต่ำช่วยลด CPU + RAM
     ['White Screen'] = false, -- จอขาวช่วยลด CPU + RAM
     ['Close Ui'] = true, -- ปิดหน้าต่าง Ui
@@ -229,11 +229,15 @@ local function AttackNoCD()
     local GetFastAttack = debug.getupvalues(CombatFramework)[2]
     local activeController = GetFastAttack.activeController
 
-    local RigLib = require(game.ReplicatedStorage:WaitForChild("CombatFramework"):WaitForChild("RigLib"))
-local getBladeHits = RigLib.getBladeHits(plr.Character, {plr.Character.HumanoidRootPart}, 60)
+    local RigLib =
+    require(game.ReplicatedStorage:WaitForChild("CombatFramework"):WaitForChild("RigLib"))
+    local getBladeHits = RigLib.getBladeHits
+
+    local hits = getBladeHits(plr.Character,
+    {plr.Character.HumanoidRootPart}, 60)
     local cac = {}
     local hash = {}
-    for k, v in pairs(getBladeHits) do
+    for k, v in pairs(hits) do
         if v.Parent and v.Parent:FindFirstChild("HumanoidRootPart") and not hash[v.Parent] then
             table.insert(cac, v.Parent.HumanoidRootPart)
             hash[v.Parent] = true
