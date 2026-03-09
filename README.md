@@ -135,13 +135,17 @@ and game.Players.LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework")
 
 -- FAST ATTACK
 local CombatFramework
-
-repeat task.wait()
-    pcall(function()
-        CombatFramework =
-        require(game.Players.LocalPlayer.PlayerScripts:WaitForChild("CombatFramework"))
-    end)
-until CombatFramework
+do
+    local plr = game:GetService("Players").LocalPlayer
+    repeat task.wait() until plr and plr:FindFirstChild("PlayerScripts")
+    local ok
+    repeat
+        ok = pcall(function()
+            CombatFramework = require(plr.PlayerScripts:FindFirstChild("CombatFramework"))
+        end)
+        if not ok then task.wait(0.1) end
+    until ok and CombatFramework
+end
 
 local function GetCurrentBlade()
     local up = debug.getupvalues(CombatFramework)
@@ -161,76 +165,98 @@ end
 
 local function AttackNoCD()
     local plr = game:GetService("Players").LocalPlayer
-    
-    if not plr.Character then return end
-    if not plr.Character:FindFirstChild("HumanoidRootPart") then
-    return end
-    local up = debug.getupvalues(CombatFramework)
-    if not up or not up[2] then return end
+    if not plr or not plr.Character then return end
+    if not plr.Character:FindFirstChild("HumanoidRootPart") then return end
+    if not CombatFramework then return end
+
+    local success, up = pcall(function() return debug.getupvalues(CombatFramework) end)
+    if not success or not up or not up[2] then return end
     local GetFastAttack = up[2]
-    local activeController = GetFastAttack and
-    GetFastAttack.activeController
+    if not GetFastAttack then return end
+    local activeController = GetFastAttack.activeController
     if not activeController then return end
+    -- check attack function exists
+    if not activeController.attack then return end
 
-    local RigLib =
-    require(game.ReplicatedStorage:WaitForChild("CombatFramework"):WaitForChild("RigLib"))
+    local okReq, RigLib = pcall(function()
+        return require(game.ReplicatedStorage:WaitForChild("CombatFramework"):WaitForChild("RigLib"))
+    end)
+    if not okReq or not RigLib or not RigLib.getBladeHits then return end
+
     local getBladeHits = RigLib.getBladeHits
+    local okHits, hits = pcall(function()
+        return getBladeHits(plr.Character, {plr.Character.HumanoidRootPart}, 60)
+    end)
+    if not okHits or not hits then return end
 
-    local hits = getBladeHits(plr.Character,
-    {plr.Character.HumanoidRootPart}, 60)
     local cac = {}
     local hash = {}
-    for k, v in pairs(hits) do
-        if v.Parent and v.Parent:FindFirstChild("HumanoidRootPart") and not hash[v.Parent] then
+    for _, v in pairs(hits) do
+        if v and v.Parent and v.Parent:FindFirstChild("HumanoidRootPart") and not hash[v.Parent] then
             table.insert(cac, v.Parent.HumanoidRootPart)
             hash[v.Parent] = true
         end
     end
-    getBladeHits = cac
 
-    if #getBladeHits > 0 then
-        local ok, u8 = pcall(function() return debug.getupvalue(activeController.attack, 5) end)
-        local ok2, u9 = pcall(function() return debug.getupvalue(activeController.attack, 6) end)
-        local ok3, u7 = pcall(function() return debug.getupvalue(activeController.attack, 4) end)
-        local ok4, u10 = pcall(function() return debug.getupvalue(activeController.attack, 7) end)
+    if #cac == 0 then return end
 
-        if not (ok and ok2 and ok3 and ok4) then return end
+    local ok1, u8 = pcall(function() return debug.getupvalue(activeController.attack, 5) end)
+    local ok2, u9 = pcall(function() return debug.getupvalue(activeController.attack, 6) end)
+    local ok3, u7 = pcall(function() return debug.getupvalue(activeController.attack, 4) end)
+    local ok4, u10 = pcall(function() return debug.getupvalue(activeController.attack, 7) end)
+    if not (ok1 and ok2 and ok3 and ok4) then return end
 
-        local u12 = (u8 * 798405 + u7 * 727595) % u9
-        local u13 = u7 * 798405
-        (function()
-            u12 = (u12 * u9 + u13) % 1099511627776
-            u8 = math.floor(u12 / u9)
-            u7 = u12 - u8 * u9
-        end)()
-        u10 = u10 + 1
-        pcall(function() debug.setupvalue(activeController.attack, 5, u8) end)
-        pcall(function() debug.setupvalue(activeController.attack, 6, u9) end)
-        pcall(function() debug.setupvalue(activeController.attack, 4, u7) end)
-        pcall(function() debug.setupvalue(activeController.attack, 7, u10) end)
+    -- math stuff (เหมือนเดิม)
+    local u12 = (u8 * 798405 + u7 * 727595) % u9
+    local u13 = u7 * 798405
+    (function()
+        u12 = (u12 * u9 + u13) % 1099511627776
+        u8 = math.floor(u12 / u9)
+        u7 = u12 - u8 * u9
+    end)()
+    u10 = u10 + 1
 
-        pcall(function()
-            if plr.Character and plr.Character:FindFirstChildOfClass("Tool") and activeController.blades and activeController.blades[1] then
+    pcall(function() debug.setupvalue(activeController.attack, 5, u8) end)
+    pcall(function() debug.setupvalue(activeController.attack, 6, u9) end)
+    pcall(function() debug.setupvalue(activeController.attack, 4, u7) end)
+    pcall(function() debug.setupvalue(activeController.attack, 7, u10) end)
 
-if activeController.animator
-and activeController.animator.anims
-and activeController.animator.anims.basic
-and activeController.animator.anims.basic[1]
-and typeof(activeController.animator.anims.basic[1].Play) == "function" then
-
-activeController.animator.anims.basic[1]:Play(0.01,0.01,0.01)
-
-end
-                game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange", tostring(GetCurrentBlade()))
-                if game.ReplicatedStorage:FindFirstChild("Remotes") and game.ReplicatedStorage.Remotes:FindFirstChild("Validator") then
-                    game.ReplicatedStorage.Remotes.Validator:FireServer(math.floor(u12 / 1099511627776 * 16777215), u10)
-                elseif game.ReplicatedStorage:FindFirstChild("Validator") then
-                    game.ReplicatedStorage.Validator:FireServer(math.floor(u12 / 1099511627776 * 16777215), u10)
-                end
-                game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("hit", getBladeHits, 1, "")
+    pcall(function()
+        if plr.Character and plr.Character:FindFirstChildOfClass("Tool") and activeController.blades and activeController.blades[1] then
+            -- safety check animator chain
+            if activeController.animator
+            and activeController.animator.anims
+            and activeController.animator.anims.basic
+            and activeController.animator.anims.basic[1]
+            and typeof(activeController.animator.anims.basic[1].Play) == "function" then
+                pcall(function()
+                    activeController.animator.anims.basic[1]:Play(0.01, 0.01, 0.01)
+                end)
             end
-        end)
-    end
+
+            -- safe fire validator
+            local validator = nil
+            if game.ReplicatedStorage:FindFirstChild("Remotes") and game.ReplicatedStorage.Remotes:FindFirstChild("Validator") then
+                validator = game.ReplicatedStorage.Remotes.Validator
+            elseif game.ReplicatedStorage:FindFirstChild("Validator") then
+                validator = game.ReplicatedStorage.Validator
+            end
+            if validator and typeof(validator.FireServer) == "function" then
+                pcall(function()
+                    validator:FireServer(math.floor(u12 / 1099511627776 * 16777215), u10)
+                end)
+            end
+
+            -- safe fire hit
+            local rigEvent = game:GetService("ReplicatedStorage"):FindFirstChild("RigControllerEvent")
+            if rigEvent and typeof(rigEvent.FireServer) == "function" then
+                pcall(function()
+                    rigEvent:FireServer("weaponChange", tostring(GetCurrentBlade()))
+                    rigEvent:FireServer("hit", cac, 1, "")
+                end)
+            end
+        end
+    end)
 end
 
 local FastAttack = true
