@@ -25,8 +25,8 @@ _G.Fruit_Main = { -- เลือกผลหลักและเควสโ�
     ['Fast Dough Awaken'] = true -- ใช้ผลปีศาจ 2ช1ล้าน+ในการลงดันโมจิ จะทำให้โมจิตื่นเร็วขึ้น
 }
 _G.Fruit = { -- เลือกผลที่ต้องการให้กิน
-'Dark-Dark'}
--- ผลทั้งหมดในเกมส์'Dark-Dark','Ice-Ice','Sand-Sand','Magma-Magma','Light-Light','Quake-Quake','Kilo-Kilo','Spin-Spin','Chop-Chop','Spring-Spring','Bomb-Bomb','Smoke-Smoke','Spike-Spike','Flame-Flame','Bird-Bird: Falcon','Revive-Revive','Diamond-Diamond','Love-Love','Rubber-Rubber','Barrier-Barrier','Human-Human: Buddha','String-String','Bird-Bird: Phoenix','Portal-Portal','Rumble-Rumble','Paw-Paw','Blizzard-Blizzard','Gravity-Gravity','Dough-Dough','Shadow-Shadow','Venom-Venom','Control-Control','Spirit-Spirit','Dragon-Dragon','Leopard-Leopard'
+'Dark-Dark'
+}
 _G.Sword = { -- เลือกดาบที่ต้องการให้ทำ
     ['Saber'] = true,
     ['Midnight Blade'] = true,
