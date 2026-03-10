@@ -1,4 +1,4 @@
-repeat task.wait() until game:GetService("Players").LocalPlayer
+repeat task.wait() until game and game.Players and game.Players.LocalPlayer
 _G.Main = {
     ['AutoFarm'] = true,
     ['TweenSpeed'] = 350,
