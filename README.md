@@ -85,15 +85,14 @@ _G.Mastery = { -- เลือกมาสเตอรี่ที่ต้อ�
         [4] = 'Venom Bow'
     }
 }
-local DEFAULT_CODES = {"Sub2Fer999","Enyu_is_Pro","Magicbus","JCWK","Starcodeheo","Bluxxy"}
-
--- CORE
 local Players = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
 local LocalPlayer = Players.LocalPlayer
+
+local DEFAULT_CODES = {"Sub2Fer999","Enyu_is_Pro","Magicbus","JCWK","Starcodeheo","Bluxxy"}
 
 -- safe find remote helper (พยายามหา Remotes.CommF_ หรือ CommF หรือชื่ออื่น)
 local function getRemote(name)
