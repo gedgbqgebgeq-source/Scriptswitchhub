@@ -1,8 +1,4 @@
-if not game:IsLoaded() then
-    repeat
-        game.Loaded:Wait()
-    until game:IsLoaded()
-end
+repeat task.wait() until game:GetService("Players").LocalPlayer
 _G.Main = {
     ['AutoFarm'] = true,
     ['TweenSpeed'] = 350,
