@@ -1,4 +1,4 @@
-_G.Main = {
+getgenv().Main = {
     ['AutoFarm'] = true,
     ['TweenSpeed'] = 350,
     ['FPS Booster'] = true, -- ปรับภาพต่ำช่วยลด CPU + RAM
@@ -10,7 +10,7 @@ _G.Main = {
     ['Bring Fruit'] = true, -- ดึงผล
     ['Kill Boss'] = true -- ฟาร์มบอส
 }
-_G.Melee = { -- เลือกหมัดที่ต้องการให้ทำ
+getgenv().Melee = { -- เลือกหมัดที่ต้องการให้ทำ
     ['Superhuman'] = true,
     ['Death Step'] = true,
     ['Sharkman Karate'] = true,
@@ -18,15 +18,14 @@ _G.Melee = { -- เลือกหมัดที่ต้องการให�
     ['Dragon Talon'] = true,
     ['Godhuman'] = true
 }
-_G.Fruit_Main = { -- เลือกผลหลักและเควสโมจิตื่น
+getgenv().Fruit_Main = { -- เลือกผลหลักและเควสโมจิตื่น
     ['Main'] = {'Dough-Dough', 'Dark-Dark', 'Leopard-Leopard'}, -- ผลหลักถ้าเจอผลนี้ต่อไห้มีผลในตัวก็จะทำการกินผลนี้เหมือนเดิม
     ['Quest Dough Awaken'] = true, -- ทำเควสโมจิตื่นเมื่อได้รับแก้วน้ำ God's Chalice
     ['Fast Dough Awaken'] = true -- ใช้ผลปีศาจ 2ช1ล้าน+ในการลงดันโมจิ จะทำให้โมจิตื่นเร็วขึ้น
 }
-_G.Fruit = { -- เลือกผลที่ต้องการให้กิน
-'Dark-Dark'
-}
-_G.Sword = { -- เลือกดาบที่ต้องการให้ทำ
+getgenv().Fruit = { -- เลือกผลที่ต้องการให้กิน
+'Dark-Dark'}
+getgenv().Sword = { -- เลือกดาบที่ต้องการให้ทำ
     ['Saber'] = true,
     ['Midnight Blade'] = true,
     ['Shizu'] = true,
@@ -45,13 +44,13 @@ _G.Sword = { -- เลือกดาบที่ต้องการให้�
     ['True Triple Katana'] = true,
     ['Cursed Dual Katana'] = true
 }
-_G.Gun = { -- เลือกปืนที่ต้องการให้ทำ
+getgenv().Gun = { -- เลือกปืนที่ต้องการให้ทำ
     ['Kabucha'] = true,
     ['Acidum Rifle'] = true,
     ['Soul Guitar'] = true,
     ['Venom Bow'] = true
 }
-_G.Mastery = { -- เลือกมาสเตอรี่ที่ต้องการฟาร์ม
+getgenv().Mastery = { -- เลือกมาสเตอรี่ที่ต้องการฟาร์ม
     ['Melee'] = true,
     ['Fruit'] = true,
     ['Sword'] = true,
@@ -126,7 +125,7 @@ repeat task.wait() until LocalPlayer.Character:FindFirstChild("HumanoidRootPart"
 
 -- choose team if config indicates
 pcall(function()
-    local team = (_G.Main and _G.Main.Team) or "Pirates"
+    local team = (getgenv().Main and getgenv().Main.Team) or "Pirates"
     if remoteComm then
         pcall(function()
             remoteComm:InvokeServer("SetTeam", team)
@@ -162,7 +161,7 @@ local function TweenTo(cf, speed)
     if not LocalPlayer or not LocalPlayer.Character then return end
     if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
 
-    speed = speed or (_G.Main and _G.Main.TweenSpeed) or 350
+    speed = speed or (getgenv().Main and getgenv().Main.TweenSpeed) or 350
     local hrp = LocalPlayer.Character.HumanoidRootPart
 
     if currentTween and typeof(currentTween.Cancel) == "function" then
@@ -485,7 +484,7 @@ until LocalPlayer:FindFirstChild("Data")
 task.spawn(function()
     while task.wait(0.3) do
         pcall(function()
-            if not _G.Main or not _G.Main.AutoFarm then
+            if not getgenv.Main or not getgenv.Main.AutoFarm then
                     return
                 end
                 
@@ -503,10 +502,10 @@ task.spawn(function()
 
             if mob and mob:FindFirstChild("HumanoidRootPart") then
                 local targetC = mob.HumanoidRootPart.CFrame * CFrame.new(0,15,0)
-                TweenTo(targetC, (_G.Main and _G.Main.TweenSpeed) or 350)
+                TweenTo(targetC, (getgenv().Main and getgenv().Main.TweenSpeed) or 350)
             else
                 if mapping and mapping.CFrameMon then
-                    TweenTo(mapping.CFrameMon, (_G.Main and _G.Main.TweenSpeed) or 350)
+                    TweenTo(mapping.CFrameMon, (getgenv.Main and getgenv.Main.TweenSpeed) or 350)
                 end
             end
         end)
