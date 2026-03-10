@@ -143,53 +143,44 @@ task.spawn(function()
     local codes = (_G.RedeemCodes and type(_G.RedeemCodes)=="table") and _G.RedeemCodes or DEFAULT_CODES
     for _, c in ipairs(codes) do
         pcall(function()
-            if remoteRedeem then
+            if remoteRedeem and typeof(remoteRedeem.InvokeServer) == "function" then
                 remoteRedeem:InvokeServer(c)
             else
-                -- some games use Remotes.Redeem inside Remotes
                 if Replicated:FindFirstChild("Remotes") and Replicated.Remotes:FindFirstChild("Redeem") then
-                    Replicated.Remotes.Redeem:InvokeServer(c)
+                    local r = Replicated.Remotes.Redeem
+                    if r and typeof(r.InvokeServer) == "function" then
+                        r:InvokeServer(c)
+                    end
                 end
             end
         end)
         task.wait(0.6)
     end
-end
+end)
 
 -- TWEEN
 local currentTween = nil
 
 local function TweenTo(cf, speed)
-
     if typeof(cf) ~= "CFrame" then return end
-    if not LocalPlayer.Character then return end
+    if not LocalPlayer or not LocalPlayer.Character then return end
     if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
 
     speed = speed or (_G.Main and _G.Main.TweenSpeed) or 350
-
     local hrp = LocalPlayer.Character.HumanoidRootPart
 
     if currentTween and typeof(currentTween.Cancel) == "function" then
-        pcall(function()
-            currentTween:Cancel()
-        end)
+        pcall(function() currentTween:Cancel() end)
     end
 
     local dist = (hrp.Position - cf.Position).Magnitude
     if dist < 5 then return end
+    local time = math.max(dist / speed, 0.12)
 
-    local time = math.max(dist / speed,0.12)
-
-    currentTween = TweenService:Create(
-        hrp,
-        TweenInfo.new(time,Enum.EasingStyle.Linear),
-        {CFrame = cf}
-    )
+    currentTween = TweenService:Create(hrp, TweenInfo.new(time, Enum.EasingStyle.Linear), {CFrame = cf})
 
     if currentTween and typeof(currentTween.Play) == "function" then
-        pcall(function()
-            currentTween:Play()
-        end)
+        pcall(function() currentTween:Play() end)
     end
 end
 
@@ -197,18 +188,16 @@ end
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
-
             if remoteComm and typeof(remoteComm.InvokeServer) == "function" then
                 if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
-                    remoteComm:InvokeServer("Buso")
+                    pcall(function() remoteComm:InvokeServer("Buso") end)
                 end
             else
                 local alt = getRemote("Buso") or getRemote("Haki")
                 if alt and typeof(alt.InvokeServer) == "function" then
-                    alt:InvokeServer()
+                    pcall(function() alt:InvokeServer() end)
                 end
             end
-
         end)
     end
 end)
@@ -259,7 +248,6 @@ local function AttackNoCD()
     if not GetFastAttack then return end
     local activeController = GetFastAttack.activeController
     if not activeController then return end
-    -- check attack function exists
     if not activeController.attack then return end
 
     local okReq, RigLib = pcall(function()
@@ -290,7 +278,6 @@ local function AttackNoCD()
     local ok4, u10 = pcall(function() return debug.getupvalue(activeController.attack, 7) end)
     if not (ok1 and ok2 and ok3 and ok4) then return end
 
-    -- math stuff (เหมือนเดิม)
     local u12 = (u8 * 798405 + u7 * 727595) % u9
     local u13 = u7 * 798405
     (function()
@@ -307,7 +294,6 @@ local function AttackNoCD()
 
     pcall(function()
         if plr.Character and plr.Character:FindFirstChildOfClass("Tool") and activeController.blades and activeController.blades[1] then
-            -- safety check animator chain
             if activeController.animator
             and activeController.animator.anims
             and activeController.animator.anims.basic
@@ -318,7 +304,6 @@ local function AttackNoCD()
                 end)
             end
 
-            -- safe fire validator
             local validator = nil
             if game.ReplicatedStorage:FindFirstChild("Remotes") and game.ReplicatedStorage.Remotes:FindFirstChild("Validator") then
                 validator = game.ReplicatedStorage.Remotes.Validator
@@ -331,7 +316,6 @@ local function AttackNoCD()
                 end)
             end
 
-            -- safe fire hit
             local rigEvent = game:GetService("ReplicatedStorage"):FindFirstChild("RigControllerEvent")
             if rigEvent and typeof(rigEvent.FireServer) == "function" then
                 pcall(function()
@@ -459,7 +443,9 @@ end
 
 -- CheckMob / CheckQuest / Mob Magnet / Farm Loop
 local function findMobByName(name)
-    for _, v in pairs(workspace.Enemies:GetChildren()) do
+    local enemies = workspace:FindFirstChild("Enemies")
+    if not enemies then return nil end
+    for _, v in pairs(enemies:GetChildren()) do
         if v.Name == name and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
             return v
         end
@@ -468,10 +454,12 @@ local function findMobByName(name)
 end
 
 local function nearestEnemy()
+    local enemies = workspace:FindFirstChild("Enemies")
+    if not enemies then return nil end
     local best, dist = nil, math.huge
     if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return nil end
     local pos = LocalPlayer.Character.HumanoidRootPart.Position
-    for _, v in pairs(workspace.Enemies:GetChildren()) do
+    for _, v in pairs(enemies:GetChildren()) do
         if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
             local d = (v.HumanoidRootPart.Position - pos).Magnitude
             if d < dist then dist = d; best = v end
@@ -486,7 +474,7 @@ local function StartQuestIfNeeded(mapping)
         local hasQuestGui = LocalPlayer.PlayerGui:FindFirstChild("Main") and LocalPlayer.PlayerGui.Main:FindFirstChild("Quest")
         local questVisible = hasQuestGui and LocalPlayer.PlayerGui.Main.Quest.Visible
         if not questVisible then
-            if remoteComm then
+            if remoteComm and typeof(remoteComm.InvokeServer) == "function" then
                 pcall(function() remoteComm:InvokeServer("StartQuest", mapping.NameQuest, mapping.QuestLv) end)
                 task.wait(0.6)
             end
@@ -519,10 +507,10 @@ task.spawn(function()
 
             if mob and mob:FindFirstChild("HumanoidRootPart") then
                 local targetC = mob.HumanoidRootPart.CFrame * CFrame.new(0,15,0)
-                TweenTo(targetC, (_G.Main and _G.Main.TweenSpeed) or 325)
+                TweenTo(targetC, (_G.Main and _G.Main.TweenSpeed) or 350)
             else
                 if mapping and mapping.CFrameMon then
-                    TweenTo(mapping.CFrameMon, (_G.Main and _G.Main.TweenSpeed) or 325)
+                    TweenTo(mapping.CFrameMon, (_G.Main and _G.Main.TweenSpeed) or 350)
                 end
             end
         end)
