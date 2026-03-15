@@ -1,0 +1,653 @@
+_G.AutoFarm   = true
+_G.AutoAttack = true
+_G.AutoBuso   = true
+_G.AutoHoldCombat = true
+_G.AutoStats = true
+
+---SERVICES
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RS = game:GetService("ReplicatedStorage")
+local CS = game:GetService("CollectionService")
+
+-- AUTO TEAM + AUTO REDEEM
+task.spawn(function()
+    repeat task.wait() until game:IsLoaded()
+
+    local plr = game.Players.LocalPlayer
+    local Rep = game:GetService("ReplicatedStorage")
+
+    -- เลือกฝั่ง Pirates
+    if not plr.Team then
+        Rep.Remotes.CommF_:InvokeServer("SetTeam","Pirates")
+    end
+
+    repeat task.wait() until plr.Team
+
+    -- Redeem Codes
+    local codes = {
+        "LIGHTNINGABUSE","1LOSTADMIN","ADMINFIGHT","GIFTING_HOURS",
+        "Chandler","kittgaming","KITT_RESET","Fudd10","fudd10_v2",
+        "Bignews","Sub2CaptainMaui","Sub2Fer999","Enyu_is_Pro",
+        "Magicbus","JCWK","Starcodeheo","Bluxxy",
+        "SUB2GAMERROBOT_EXP1","Sub2NoobMaster123"
+    }
+
+    for _,code in ipairs(codes) do
+        pcall(function()
+            Rep.Remotes.Redeem:InvokeServer(code)
+        end)
+        task.wait(0.5)
+    end
+end)
+
+local plr = Players.LocalPlayer
+local char, hrp, hum
+
+---CHARACTER
+local function RefreshChar()
+char = plr.Character or plr.CharacterAdded:Wait()
+hrp  = char:WaitForChild("HumanoidRootPart")
+hum  = char:WaitForChild("Humanoid")
+end
+RefreshChar()
+plr.CharacterAdded:Connect(RefreshChar)
+
+---NOCLIP
+task.spawn(function()
+    while task.wait() do
+        local char = Player.Character
+        if char then
+            for _,v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+---AUTO HOLD COMBAT
+local CombatNames = {
+"Combat","Black Leg","Electro","Dragon Claw",
+"Death Step","Electric Claw","Sharkman Karate","Godhuman"
+}
+
+local function HoldCombat()
+if not _G.AutoHoldCombat then return end
+for _,name in ipairs(CombatNames) do
+if char:FindFirstChild(name) then return end
+local tool = plr.Backpack:FindFirstChild(name)
+if tool then
+hum:EquipTool(tool)
+return
+end
+end
+end
+
+---BUSO HAKI
+
+local function IsBusoOn()
+return hum:FindFirstChild("LeftHand_BusoLayer1") ~= nil
+end
+
+task.spawn(function()
+while task.wait(1) do
+if _G.AutoBuso and not IsBusoOn() then
+pcall(function()
+RS.Remotes.CommF:InvokeServer("Buso")
+end)
+end
+end
+end)
+
+---AUTO STATS (MELEE / DEFENSE / FRUIT)
+
+_G.AutoStats = true
+
+task.spawn(function()
+    while task.wait(0.05) do -- ปรับความรัวได้ (0.03 = รัวมาก)
+        if _G.AutoStats then
+            pcall(function()
+                local CommF = game:GetService("ReplicatedStorage")
+                    :WaitForChild("Remotes")
+                    :WaitForChild("CommF_")
+
+                -- Melee
+                CommF:InvokeServer("AddPoint", "Melee", 1)
+
+                -- Defense
+                CommF:InvokeServer("AddPoint", "Defense", 1)
+
+                -- Demon Fruit
+                CommF:InvokeServer("AddPoint", "Demon Fruit", 1)
+            end)
+        end
+    end
+end)
+
+---MOVE
+
+local function FlyTo(cf)
+RefreshChar()
+local dist = (hrp.Position - cf.Position).Magnitude
+local tween = TweenService:Create(
+hrp,
+TweenInfo.new(math.clamp(dist/200,0.2,40), Enum.EasingStyle.Linear),
+{CFrame = cf}
+)
+tween:Play()
+tween.Completed:Wait()
+end
+
+-- Auto Roll + Store Fruit
+task.spawn(function()
+    while task.wait(0.5) do
+ 
+        pcall(function()
+            CommF_:InvokeServer("Cousin","Buy","DLCBoxData")
+        end)
+ 
+        task.wait(1)
+ 
+        for _,v in pairs(Player.Backpack:GetChildren()) do
+            if v:IsA("Tool") then
+ 
+                local baseName = v.Name:gsub(" Fruit","")
+                local fruitName = baseName.."-"..baseName
+ 
+                pcall(function()
+                    CommF:InvokeServer("StoreFruit",fruitName,v)
+                end)
+ 
+                task.wait(0.5)
+ 
+                if v.Parent == Player.Backpack then
+ 
+                    Player.Character.Humanoid:EquipTool(v)
+                    task.wait(0.3)
+ 
+                    pcall(function()
+                        local args = {"Drop"}
+                        Player.Character:WaitForChild(v.Name)
+                        :WaitForChild("EatRemote")
+                        :InvokeServer(unpack(args))
+                    end)
+ 
+                end
+            end
+        end
+    end
+end)
+
+---AUTO BUY CONFIG
+
+local Bought = {} -- กันซื้อซ้ำ
+
+local BuyTable = {
+    {
+        Name = "Black Leg",
+        NeedBeli = 150000,
+        GoTo = CFrame.new(-986.91, 13.73, 3989.71) * CFrame.Angles(0, -1.610, 0),
+        Remote = "CommF_",
+        Args = {"BuyBlackLeg"}
+    },
+}
+local function AutoBuy()
+    local beli = game:GetService("Players").LocalPlayer.Data.Beli.Value
+
+    for _, item in ipairs(BuyTable) do
+        if beli >= item.NeedBeli and not Bought[item.Name] then
+            Bought[item.Name] = true
+
+            -- บินไปจุดซื้อ
+            FlyTo(item.GoTo * CFrame.new(0, 10, 0))
+            task.wait(0.5)
+
+            -- ซื้อ
+            pcall(function()
+                game:GetService("ReplicatedStorage")
+                    .Remotes[item.Remote]
+                    :InvokeServer(unpack(item.Args))
+            end)
+
+            warn("🛒 Bought:", item.Name)
+            task.wait(1)
+        end
+    end
+end
+
+--LEVEL CHECK ()
+
+local MON, QUESTNAME, QUESTNUMBER, QUESTPOS
+function CheckLevel()
+local Level = plr.Data.Level.Value
+
+if Level >= 1 and Level <= 9 then  
+    MON = "Bandit"  
+    QUESTNAME = "BanditQuest1"  
+    QUESTNUMBER = 1  
+    QUESTPOS = CFrame.new(1060.9383,16.4550,1547.7841) -- ใส่เอง  
+
+elseif Level >= 10 and Level <= 14 then  
+    MON = "Monkey"  
+    QUESTNAME = "JungleQuest"  
+    QUESTNUMBER = 1  
+    QUESTPOS = CFrame.new(-1597.9442, 40.7667, 153.2263)
+
+elseif Level >= 15 and Level <= 29 then
+MON = "Gorilla"
+QUESTNAME = "JungleQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-1296.8525390625, 18.60297203063965, -450.25018310546875)
+MONPOS = CFrame.new(-1296.8525390625, 18.60297203063965, -450.25018310546875)
+
+elseif Level >= 30 and Level <= 39 then
+MON = "Pirate"
+QUESTNAME = "BuggyQuest1"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(-1105.0765380859375, 13.79333782196045, 3896.6416015625)
+MONPOS = CFrame.new(-1105.0765380859375, 13.79333782196045, 3896.6416015625)
+
+elseif Level >= 40 and Level <= 59 then
+MON = "Brute"
+QUESTNAME = "BuggyQuest1"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-1059.9144287109375, 14.85149097442627, 4304.1982421875)
+MONPOS = CFrame.new(-1059.9144287109375, 14.85149097442627, 4304.1982421875)
+
+elseif Level >= 60 and Level <= 74 then
+MON = "Desert Bandit"
+QUESTNAME = "DesertQuest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(911.6411743164062, 15.330256462097168, 4569.162109375)
+MONPOS = CFrame.new(911.6411743164062, 15.330256462097168, 4569.162109375)
+
+elseif Level >= 75 and Level <= 89 then
+MON = "Desert Officer"
+QUESTNAME = "DesertQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(1556.142333984375, 14.493334770202637, 4381.48583984375)
+MONPOS = CFrame.new(1556.142333984375, 14.493334770202637, 4381.48583984375)
+
+elseif Level >= 90 and Level <= 99 then
+MON = "Snow Bandit"
+QUESTNAME = "SnowQuest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(1356.152099609375, 105.95249938964844, -1328.027099609375)
+MONPOS = CFrame.new(1356.152099609375, 105.95249938964844, -1328.027099609375)
+
+elseif Level >= 100 and Level <= 119 then
+MON = "Snowman"
+QUESTNAME = "SnowQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(1217.064697265625, 138.05267333984375, -1488.16455078125)
+MONPOS = CFrame.new(1217.064697265625, 138.05267333984375, -1488.16455078125)
+
+elseif Level >= 120 and Level <= 149 then
+MON = "Chief Petty Officer"
+QUESTNAME = "MarineQuest2"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(-4922.46826171875, 20.693330764770508, 3993.65234375)
+MONPOS = CFrame.new(-4922.46826171875, 20.693330764770508, 3993.65234375)
+
+elseif Level >= 150 and Level <= 174 then
+MON = "Sky Bandit"
+QUESTNAME = "SkyQuest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(-4955.767578125, 295.7853088378906, -2901.028564453125)
+MONPOS = CFrame.new(-4955.767578125, 295.7853088378906, -2901.028564453125)
+
+elseif Level >= 175 and Level <= 199 then
+MON = "Dark Master"
+QUESTNAME = "SkyQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-5274.9296875, 388.69329833984375, -2181.8759765625)
+MONPOS = CFrame.new(-5274.9296875, 388.69329833984375, -2181.8759765625)
+
+elseif Level >= 200 and Level <= 224 then
+MON = "Prisoner"
+QUESTNAME = "PrisonerQuest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(5168.2099609375, 2.9658734798431396, 413.2968444824219)
+MONPOS = CFrame.new(5168.2099609375, 2.9658734798431396, 413.2968444824219)
+
+elseif Level >= 225 and Level <= 374 then
+MON = "Dangerous Prisoner"
+QUESTNAME = "PrisonerQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(5524.05810546875, 1.674311876296997, 531.5927124023438)
+MONPOS = CFrame.new(5524.05810546875, 1.674311876296997, 531.5927124023438)
+
+elseif Level >= 375 and Level <= 399 then
+MON = "Military Soldier"
+QUESTNAME = "MagmaQuest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(-5465.22314453125, 8.710793495178223, 8408.6728515625)
+MONPOS = CFrame.new(-5465.22314453125, 8.710793495178223, 8408.6728515625)
+
+elseif Level >= 400 and Level <= 449 then
+MON = "Military Spy"
+QUESTNAME = "MagmaQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-5864.23193359375, 77.27232360839844, 8836.806640625)
+MONPOS = CFrame.new(-5864.23193359375, 77.27232360839844, 8836.806640625)
+
+elseif Level >= 450 and Level <= 474 then
+MON = "God's Guard"
+QUESTNAME = "SkyExp1Quest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(-4630.412109375, 849.9442749023438, -1938.43017578125)
+MONPOS = CFrame.new(-4630.412109375, 849.9442749023438, -1938.43017578125)
+
+elseif Level >= 475 and Level <= 524 then
+MON = "Shanda"
+QUESTNAME = "SkyExp1Quest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-7679.5693359375, 5566.50537109375, -498.9761962890625)
+MONPOS = CFrame.new(-7679.5693359375, 5566.50537109375, -498.9761962890625)
+
+elseif Level >= 525 and Level <= 549 then
+MON = "Royal Squad"
+QUESTNAME = "SkyExp2Quest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(-7746.39501953125, 5612.08837890625, -1422.852294921875)
+MONPOS = CFrame.new(-7746.39501953125, 5612.08837890625, -1422.852294921875)
+
+elseif Level >= 550 and Level <= 624 then
+MON = "Royal Soldier"
+QUESTNAME = "SkyExp2Quest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-7748.37353515625, 5622.302734375, -1745.48974609375)
+MONPOS = CFrame.new(-7748.37353515625, 5622.302734375, -1745.48974609375)
+
+elseif Level >= 625 and Level <= 649 then
+MON = "Galley Pirate"
+QUESTNAME = "FountainQuest"
+QUESTNUMBER = 1
+QUESTPOS = CFrame.new(5477.10302734375, 38.58033752441406, 4003.539794921875)
+MONPOS = CFrame.new(5477.10302734375, 38.58033752441406, 4003.539794921875)
+
+elseif Level >= 650 and Level <= 699 then
+MON = "Galley Captain"
+QUESTNAME = "FountainQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(5608.19189453125, 38.542327880859375, 4971.44482421875)
+MONPOS = CFrame.new(5608.19189453125, 38.542327880859375, 4971.44482421875)
+
+elseif Level >= 1350 and Level <= 2800 then
+MON = "Water Fighter"
+QUESTNAME = "ForgottenQuest"
+QUESTNUMBER = 2
+QUESTPOS = CFrame.new(-3510.5288, 239.4477, -10573.2304)
+MONPOS = CFrame.new(-3350.5151, 284.0304, -10532.4228)
+-- 👉 ใส่ต่อจน 700
+end
+end
+
+--========================================
+-- QUEST
+--========================================
+function GetQuest()
+if not plr.PlayerGui.Main.Quest.Visible then
+FlyTo(QUESTPOS * CFrame.new(0,10,0))
+RS.Remotes.CommF_:InvokeServer("StartQuest", QUESTNAME, QUESTNUMBER)
+end
+end
+
+---MOB
+
+function GetNearestMob()
+local nearest, dist = nil, math.huge
+for _,v in pairs(workspace.Enemies:GetChildren()) do
+if v.Name == MON and v:FindFirstChild("HumanoidRootPart")
+and v.Humanoid.Health > 0 then
+local d = (v.HumanoidRootPart.Position - hrp.Position).Magnitude
+if d < dist then
+dist = d
+nearest = v
+end
+end
+end
+return nearest
+end
+
+-- ล็อกมอนตัวหลัก
+local function LockMob(mob)
+    local hrp = mob.HumanoidRootPart
+    local hum = mob.Humanoid
+
+    hrp.Anchored = true
+    hrp.CanCollide = false
+    hrp.Size = Vector3.new(60,60,60)
+    hrp.Transparency = 1
+
+    hum.WalkSpeed = 0
+    hum.JumpPower = 0
+    hum.AutoRotate = false
+end
+
+-- ซ้อนมอน
+local function StackMobs(mainMob)
+    local mainHRP = mainMob.HumanoidRootPart
+
+    for _,v in pairs(workspace.Enemies:GetChildren()) do
+        if v ~= mainMob
+        and v.Name == MON
+        and v:FindFirstChild("HumanoidRootPart")
+        and v.Humanoid.Health > 0 then
+
+            local hrp2 = v.HumanoidRootPart
+            local hum2 = v.Humanoid
+
+            if (hrp2.Position - mainHRP.Position).Magnitude <= 200 then
+                hrp2.CFrame = mainHRP.CFrame
+                hrp2.Anchored = true
+                hrp2.CanCollide = false
+                hum2.WalkSpeed = 0
+                hum2.JumpPower = 0
+            end
+        end
+    end
+end
+local RunService = game:GetService("RunService")
+
+local function HoverAboveMob(mob)
+    RunService.Heartbeat:Connect(function()
+        if not _G.AutoFarm then return end
+        if not mob or not mob:FindFirstChild("HumanoidRootPart") then return end
+        if mob.Humanoid.Health <= 0 then return end
+
+        hrp.CFrame = mob.HumanoidRootPart.CFrame * CFrame.new(0,40,0)
+        hrp.Velocity = Vector3.zero
+    end)
+end
+
+---STABLE MONSTER STACK (200 STUDS)
+
+local RunService = game:GetService("RunService")
+
+if sethiddenproperty then
+    sethiddenproperty(plr, "SimulationRadius", math.huge)
+end
+
+local MON_FOLDER = workspace:WaitForChild("Enemies")
+local PULL_DISTANCE = 200
+
+local function getMainMonster()
+    for _, v in pairs(MON_FOLDER:GetChildren()) do
+        if v.Name == MON
+        and v:FindFirstChild("HumanoidRootPart")
+        and v:FindFirstChild("Humanoid")
+        and v.Humanoid.Health > 0 then
+            return v
+        end
+    end
+end
+
+RunService.Heartbeat:Connect(function()
+    if not _G.AutoFarm then return end
+
+    local mainMon = getMainMonster()
+    if not mainMon then return end
+
+    local mainHRP = mainMon.HumanoidRootPart
+
+    for _, v in pairs(MON_FOLDER:GetChildren()) do
+        if v ~= mainMon
+        and v.Name == MON
+        and v:FindFirstChild("HumanoidRootPart")
+        and v:FindFirstChild("Humanoid")
+        and v.Humanoid.Health > 0 then
+
+            local hrp = v.HumanoidRootPart
+            local hum = v.Humanoid
+
+            if (hrp.Position - mainHRP.Position).Magnitude <= PULL_DISTANCE then
+                hrp.CFrame = mainHRP.CFrame
+
+                hrp.Size = Vector3.new(60,60,60)
+                hrp.Transparency = 1
+                hrp.CanCollide = false
+                hrp.Anchored = false
+
+                hum.WalkSpeed = 0
+                hum.JumpPower = 0
+                hum.AutoRotate = false
+            end
+        end
+    end
+end)
+
+---FAST ATTACK
+
+local registerAttack = RS.Modules.Net["RE/RegisterAttack"]
+local registerHit = debug.getupvalue(getrenv()._G.SendHitsToServer, 1)
+
+local function GetMobsInRange()
+local mobs = {}
+for _,mob in ipairs(CS:GetTagged("BasicMob")) do
+local root = mob:FindFirstChild("HumanoidRootPart")
+local hum = mob:FindFirstChildOfClass("Humanoid")
+if root and hum and hum.Health > 0 then
+if (root.Position - hrp.Position).Magnitude <= 200 then
+table.insert(mobs, {mob, root})
+end
+end
+end
+return mobs
+end
+
+task.spawn(function()
+while task.wait() do
+if _G.AutoAttack then
+pcall(function()
+local mobs = GetMobsInRange()
+if #mobs > 0 then
+registerAttack:FireServer(0/0)
+coroutine.resume(registerHit, mobs[1][2], {table.unpack(mobs,2)})
+end
+end)
+end
+end
+end)
+
+---MAIN FARM LOOP
+
+local currentMob = nil
+
+task.spawn(function()
+while task.wait(0.3) do
+    if _G.AutoFarm then
+        pcall(function()
+            RefreshChar()
+            HoldCombat()
+            CheckLevel()
+            GetQuest()
+
+            local mob = GetNearestMob()
+            if mob then
+                if mob ~= currentMob then
+                    currentMob = mob
+                    LockMob(mob)
+                    HoverAboveMob(mob)
+                end
+                StackMobs(mob)
+            else
+                FlyTo(QUESTPOS * CFrame.new(0,10,0))
+            end
+        end)
+    end
+end
+end)
+
+
+---MONSTER STUCK FIX (HIT FIRST → 4s NO DMG → KILL)
+
+local lastHealth = 0
+local lastDamageTime = 0
+local hasAttacked = false
+
+task.spawn(function()
+    while task.wait(0.2) do
+        if _G.AutoFarm and currentMob
+        and currentMob:FindFirstChild("Humanoid")
+        and currentMob:FindFirstChild("HumanoidRootPart") then
+
+            local hum = currentMob.Humanoid
+            local mobHRP = currentMob.HumanoidRootPart
+
+            -- เริ่มตีจริง (เลือดลดครั้งแรก)
+            if hum.Health < lastHealth then
+                hasAttacked = true
+                lastDamageTime = tick()
+                lastHealth = hum.Health
+            end
+
+            -- เซ็ตค่าเริ่มต้น
+            if lastHealth == 0 then
+                lastHealth = hum.Health
+            end
+
+            -- ตีแล้ว แต่เลือดไม่ลดเกิน 4 วิ
+            if hasAttacked
+            and hum.Health > 0
+            and (tick() - lastDamageTime) >= 4 then
+
+                warn("⚠️ MON BUG | HIT BUT NO DAMAGE → FORCE KILL")
+
+                -- ดึงมอนมาหาตัวผู้เล่น
+                mobHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, -3)
+
+                task.wait(0.1)
+
+                -- Kill มอนชนิดเดียวกันใกล้ตัว
+                for _, v in pairs(workspace.Enemies:GetChildren()) do
+                    if v:IsA("Model")
+                    and v.Name == currentMob.Name
+                    and v:FindFirstChild("Humanoid")
+                    and v.Humanoid.Health > 0 then
+                        v.Humanoid.Health = 0
+                    end
+                end
+
+                -- รีเซ็ตสถานะ
+                hasAttacked = false
+                lastHealth = 0
+                lastDamageTime = 0
+                currentMob = nil
+            end
+        else
+            -- หลุดเป้า รีเซ็ต
+            hasAttacked = false
+            lastHealth = 0
+            lastDamageTime = 0
+        end
+    end
+end)
+task.spawn(function()
+    while task.wait(2) do
+        pcall(AutoBuy)
+    end
+end)
+print(" AUTO FARM  ATTACK READY")
