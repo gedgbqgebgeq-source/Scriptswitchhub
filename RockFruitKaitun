@@ -1,3 +1,4 @@
+-- ui
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -53,17 +54,17 @@ TweenService:Create(
 	}
 ):Play()
 
--- REDEEM CODE
+-- ใส่โค้ด
 task.spawn(function()
     local codes = {
-        "SUB2GAMERROBOT_EXP1",
-        "SUB2GAMERROBOT_RESET1",
-        "SUB2NOOBMASTER123",
-        "SUB2UNCLEKIZARU",
-        "AXIORE",
-        "BIGNEWS",
-        "FUDD10",
-        "FUDD10_V2"
+        "UPDATE1",
+        "UPDATE2",
+        "SorryForDelay1",
+        "SorryForDelay2",
+        "Umamusume",
+        "38MVISITS",
+        "72KMEMBERS",
+        "FREECODE666"
     }
 
     for _,code in pairs(codes) do
@@ -107,7 +108,8 @@ function CheckQuest()
 
 			CFrameMon = CFrame.new(-1448.51806640625, 67.85301208496094, 11.46579647064209);
 
-		elseif MyLevel >= 15 and MyLevel <= 29 then
+		elseif MyLev
+el >= 15 and MyLevel <= 29 then
 
 			Mon = "Gorilla";
 
