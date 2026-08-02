@@ -80,19 +80,19 @@ function CheckQuest()
 
 	MyLevel = (game:GetService("Players")).LocalPlayer.Data.Level.Value
 
-		if MyLevel >= 1 and MyLevel <= 9 then
+		if MyLevel >= 1 and MyLevel <= 1000 then
 
-			Mon = "Bandit";
+			Mon = "Bacon";
 
 			LevelQuest = 1;
 
-			NameQuest = "BanditQuest1";
+			NameQuest = "BaconQuest1";
 
-			NameMon = "Bandit";
+			NameMon = "Bacon";
 
-			CFrameQuest = CFrame.new(1059.37195, 15.4495068, 1550.4231, 0.939700544, -0, -0.341998369, 0, 1, -0, 0.341998369, 0, 0.939700544);
+			CFrameQuest = CFrame.new(-143.022888, 16.803728, -70.899910);
 
-			CFrameMon = CFrame.new(1045.962646484375, 27.00250816345215, 1560.8203125);
+			CFrameMon = CFrame.new(-233.721756, 17.156862, -73.087219);
 
 		elseif MyLevel >= 10 and MyLevel <= 14 then
 
