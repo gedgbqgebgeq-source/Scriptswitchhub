@@ -80,13 +80,13 @@ function CheckQuest()
 
 	MyLevel = (game:GetService("Players")).LocalPlayer.Data.Level.Value
 
-		if MyLevel >= 1 and MyLevel <= 1000 then
+		if MyLevel >= 1 and MyLevel <= 999 then
 
 			Mon = "Bacon";
 
 			LevelQuest = 1;
 
-			NameQuest = "BaconQuest1";
+			NameQuest = "Quest Lvl.1";
 
 			NameMon = "Bacon";
 
@@ -94,48 +94,47 @@ function CheckQuest()
 
 			CFrameMon = CFrame.new(-233.721756, 17.156862, -73.087219);
 
-		elseif MyLevel >= 10 and MyLevel <= 14 then
+		elseif MyLevel >= 1000 and MyLevel <= 1999 then
 
-			Mon = "Monkey";
-
-			LevelQuest = 1;
-
-			NameQuest = "JungleQuest";
-
-			NameMon = "Monkey";
-
-			CFrameQuest = CFrame.new(-1598.08911, 35.5501175, 153.377838, 0, 0, 1, 0, 1, -0, -1, 0, 0);
-
-			CFrameMon = CFrame.new(-1448.51806640625, 67.85301208496094, 11.46579647064209);
-
-		elseif MyLev
-el >= 15 and MyLevel <= 29 then
-
-			Mon = "Gorilla";
+			Mon = "Bacon Strong";
 
 			LevelQuest = 2;
 
-			NameQuest = "JungleQuest";
+			NameQuest = "Quest Lvl.1000";
 
-			NameMon = "Gorilla";
+			NameMon = "Bacon Strong";
 
-			CFrameQuest = CFrame.new(-1598.08911, 35.5501175, 153.377838, 0, 0, 1, 0, 1, -0, -1, 0, 0);
+			CFrameQuest = CFrame.new(41.354237, 21.256767, -49.440350);
 
-			CFrameMon = CFrame.new(-1129.8836669921875, 40.46354675292969, -525.4237060546875);
+			CFrameMon = CFrame.new(101.547981, 21.387691, 12.803882);
 
-		elseif MyLevel >= 30 and MyLevel <= 39 then
+		elseif MyLevel >= 2000 and MyLevel <= 2999 then
 
-			Mon = "Pirate";
+			Mon = "Bacon Traveler";
 
 			LevelQuest = 1;
 
-			NameQuest = "BuggyQuest1";
+			NameQuest = "Quest Lvl.2000";
 
-			NameMon = "Pirate";
+			NameMon = "Bacon Traveler";
 
-			CFrameQuest = CFrame.new(-1141.07483, 4.10001802, 3831.5498, 0.965929627, -0, -0.258804798, 0, 1, -0, 0.258804798, 0, 0.965929627);
+			CFrameQuest = CFrame.new(-897.300110, 19.653767, 1272.713623);
 
-			CFrameMon = CFrame.new(-1103.513427734375, 13.752052307128906, 3896.091064453125);
+			CFrameMon = CFrame.new(-982.112549, 19.787254, 1318.027954);
+
+		elseif MyLevel >= 3000 and MyLevel <= 3999 then
+
+			Mon = "Bacon Fawkes";
+
+			LevelQuest = 2;
+
+			NameQuest = "Quest Lvl.3000";
+
+			NameMon = "Bacon Fawkes";
+
+			CFrameQuest = CFrame.new(-1059.018311, 19.653816, 1151.247925);
+
+			CFrameMon = CFrame.new(-1180.951904, 19.827072, 1124.076660);
 
 		elseif MyLevel >= 40 and MyLevel <= 59 then
 
